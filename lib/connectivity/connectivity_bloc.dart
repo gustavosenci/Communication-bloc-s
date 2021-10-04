@@ -5,22 +5,21 @@ import 'package:connectivity/connectivity.dart';
 
 class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
   ConnectivityBloc() : super(Empty()) {
-    on<CheckConnectivity>(_checkConnectivity);
+    on<UpdateConnectivity>(_updateConnectivity);
 
-    add(CheckConnectivity());
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      add(UpdateConnectivity(result));
+    });
   }
 
-  Future<void> _checkConnectivity(
-    CheckConnectivity event,
+  Future<void> _updateConnectivity(
+    UpdateConnectivity event,
     Emitter<ConnectivityState> emit,
   ) async {
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      if (result == ConnectivityResult.wifi ||
-          result == ConnectivityResult.mobile) {
-        emit(Connected());
-      } else {
-        emit(NotConnected());
-      }
-    });
+    if (event.result == ConnectivityResult.wifi || event.result == ConnectivityResult.mobile) {
+      emit(Connected());
+    } else {
+      emit(NotConnected());
+    }
   }
 }

@@ -2,9 +2,10 @@ import 'package:communication_bloc/bloc/git_bloc.dart';
 import 'package:communication_bloc/bloc/git_event.dart';
 import 'package:communication_bloc/bloc/git_state.dart';
 import 'package:communication_bloc/connectivity/connectivity_bloc.dart';
+import 'package:communication_bloc/connectivity/connectivity_state.dart';
 import 'package:communication_bloc/repositories/git_repo_repository_impl.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ConnectionState;
 
 class GitPage extends StatefulWidget {
   const GitPage({Key? key}) : super(key: key);
@@ -21,23 +22,16 @@ class _GitPageState extends State<GitPage> {
   @override
   void initState() {
     super.initState();
-    bloc = GitBloc(
-        repoRepository: GitRepoRepositoryImpl(dio: Dio()),
-        connectivityBloc: ConnectivityBloc());
+    bloc = GitBloc(repoRepository: GitRepoRepositoryImpl(dio: Dio()), connectivityBloc: ConnectivityBloc());
     bloc.stream.listen((state) {
       if (state is FailureState) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(state.message)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
       }
-      if (state is StateConnectOffline) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Você está offline')));
+      if (state is ConnectionState) {
+        final message = state.state is Connected ? 'Você está online' : 'Você está offline';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
       }
 
-      if (state is StateConnectOnline) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Você está online')));
-      }
       setState(() {});
     });
     bloc.add(GetRepositoryByPage(page: page));
@@ -91,6 +85,5 @@ class _GitPageState extends State<GitPage> {
 }
 
 class Onstage extends Offstage {
-  const Onstage({Key? key, required bool onStage, required Widget child})
-      : super(key: key, offstage: !onStage, child: child);
+  const Onstage({Key? key, required bool onStage, required Widget child}) : super(key: key, offstage: !onStage, child: child);
 }

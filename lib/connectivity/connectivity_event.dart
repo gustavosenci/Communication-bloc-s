@@ -1,3 +1,11 @@
-abstract class ConnectivityEvent {}
+import 'package:connectivity/connectivity.dart';
 
-class CheckConnectivity extends ConnectivityEvent {}
+abstract class ConnectivityEvent {
+  final ConnectivityResult result;
+
+  ConnectivityEvent(this.result);
+}
+
+class UpdateConnectivity extends ConnectivityEvent {
+  UpdateConnectivity(ConnectivityResult result) : super(result);
+}
