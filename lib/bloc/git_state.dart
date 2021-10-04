@@ -6,12 +6,16 @@ abstract class GitState extends Equatable {
 
   const GitState({this.repos = const []});
 
-  EmptyGitState empty() => EmptyGitState();
-  LoadingState loading() => LoadingState(repos: repos);
-  FailureState failure({required String message}) =>
+  GitState empty() => EmptyGitState();
+  GitState loading() => LoadingState(repos: repos);
+  GitState failure({required String message}) =>
       FailureState(message: message, repos: repos);
-  LoadedGitState loaded({required List<GitRepo> repos}) =>
+  GitState loaded({required List<GitRepo> repos}) =>
       LoadedGitState(repos: repos);
+  GitState stateOnline() =>
+      StateConnectOnline(repos: repos);
+  GitState stateOffline() =>
+      StateConnectOffline(repos: repos);
 
   @override
   List<Object?> get props => [repos];
@@ -35,4 +39,14 @@ class FailureState extends GitState {
 
 class LoadedGitState extends GitState {
   const LoadedGitState({required List<GitRepo> repos}) : super(repos: repos);
+}
+
+class StateConnectOnline extends GitState {
+  const StateConnectOnline({required List<GitRepo> repos})
+      : super(repos: repos);
+}
+
+class StateConnectOffline extends GitState {
+  const StateConnectOffline({required List<GitRepo> repos})
+      : super(repos: repos);
 }
